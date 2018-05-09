@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.524636461/PATH/delimiter=;
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.524636461/PATH/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.524636461/PATH/value=${MINGW_HOME}\\bin;${MSYS_HOME}\\bin;${MSYS_HOME}\\usr\\bin;C\:/Program Files/Java/jre1.8.0_161/bin/server;C\:/Program Files/Java/jre1.8.0_161/bin;C\:/Program Files/Java/jre1.8.0_161/lib/amd64;C\:\\ProgramData\\Oracle\\Java\\javapath;C\:\\Windows\\system32;C\:\\Windows;C\:\\Windows\\System32\\Wbem;C\:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C\:\\Program Files (x86)\\PDFtk\\bin\\;C\:\\Users\\oana.cezar\\AppData\\Local\\Microsoft\\WindowsApps;;C\:\\Users\\oana.cezar\\Downloads\\eclipse-cpp-oxygen-3-win32-x86_64\\eclipse;C\:\\MinGW\\bin
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.524636461/append=true
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.524636461/appendContributed=true
