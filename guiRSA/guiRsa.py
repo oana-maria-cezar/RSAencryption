@@ -5,46 +5,83 @@ import base64
 import os
 import sys
 import shutil
+import time
+
+identity = ""
+privKey = ""
+pubKey = ""
+mod = ""
+
 
 def encrypt(event=None):  # event is passed by binders.
     """Handles sending of messages."""
-    msg = inputText.get("1.0",tkinter.END)
+    global identity
+    global myTmpDir
+    global privKey
+    global pubKey
+    global mod
+
+    msg = inputText.get("1.0",tkinter.END)[:-1]
     outText.delete('1.0', tkinter.END)
 
-    f = open(myTmpDir + 'pt' + str(identity) + '.bin','wb')
+    # create file
+    f = open(myTmpDir + "locEnc" + str(identity) + ".bin","w+")
+    f.close()
+
+    f = open(myTmpDir + 'pt' + str(identity) + '.bin','w')
     f.write(msg)
     f.close()
 
-    os.popen("rsa.exe e " + myTmpDir + "pt" + str(identity) + ".bin "+ myTmpDir + "locEnc" + str(identity) + ".bin")
+    command = "rsa.exe e " + myTmpDir + "pt" + str(identity) + ".bin "+ myTmpDir + "locEnc" + str(identity) + ".bin " + mod + " " + pubKey
+    print("command encrypt: ", command, "\n")
+    os.popen(command)
+    time.sleep(1)
 
     locEncFileName = myTmpDir + "locEnc" + str(identity) + ".bin"
-    with open(locEncFileName, "rb") as f:
-        readFile = f.read()
+    print(locEncFileName)
+
+    ctP = open(locEncFileName, "rb")
+    readFile = ctP.read()
+    ctP.close()
+
+    print(bytes(readFile))
     # Convert to hex representation
     digest = base64.encodestring(bytes(readFile))
 
-    # TODO: overwirite
     outText.insert(tkinter.END, digest)
 
 def decrypt(event=None):  # event is passed by binders.
     """Handles sending of messages."""
+    global identity
+    global myTmpDir
+    global privKey
+    global pubKey
+    global mod
+
     msg = inputText.get("1.0",tkinter.END)
     outText.delete('1.0', tkinter.END)
 
-    decB64Msg = base64.decodestring(msg)
+    # create file
+    f = open(myTmpDir + "ptSender" + str(identity) + ".bin", "w+")
+    f.close()
+
+    decB64Msg = base64.decodestring(str.encode(msg))
 
     f = open(myTmpDir + 'ct' + str(identity) + '.bin','wb')
     f.write(decB64Msg)
     f.close()
 
-    os.popen("rsa.exe d " + myTmpDir + "ct" + str(identity) + ".bin " + myTmpDir + "ptSender" + str(identity) + ".bin")
+    command = "rsa.exe d " + myTmpDir + "ct" + str(identity) + ".bin " + myTmpDir + "ptSender" + str(identity) + ".bin " + mod + " " + privKey
+    print("command decrypt: ", command, "\n")
+    os.popen(command)
+    time.sleep(1)
 
     with open(myTmpDir + "ptSender" + str(identity) + ".bin", "rb") as f:
         readFile = f.read()
+    f.close()
     # Convert to hex representation
     decMsg = bytes(readFile)
 
-    # TODO: overwirite
     outText.insert(tkinter.END, decMsg)
 
 def clear(event=None):  # event is passed by binders.
@@ -54,25 +91,36 @@ def clear(event=None):  # event is passed by binders.
 #updates text
 def boxtext(new_value):
     # set nick name
+    global identity
+    global privKey
+    global pubKey
+    global mod
+
     identity = new_value
     privKey = users[identity].split(" ")[0]
     pubKey = users[identity].split(" ")[1]
     mod = users[identity].split(" ")[2]
+    print("-------------")
+    print(str(identity))
+    type(identity)
+    print("-------------")
+
 
     print("privKey: ", pubKey, " mod: ", mod)
     print("pubKey: ", pubKey, " mod: ", mod)
 
 def quit():
+    global myTmpDir
+    try:
+        shutil.rmtree(myTmpDir)
+    except OSError as e:
+        print ("Error: %s - %s." % (e.filename,e.strerror))
+
     top.quit()
 
-identity = ""
-privKey = ""
-pubKey = ""
-mod = ""
-
 users={
-    'Alice': "keys/Alice/AlicePrivExp keys/Alice/AlicePubExp keys/Alice/AliceMod1024",
-    'Bob': "keys/Bob/BobPrivExp keys/Bob/BobPubExp keys/Bob/BobMod1024",
+    'Alice': "keys/Alice/AlicePrivExp.dat keys/Alice/AlicePubExp.dat keys/Alice/AliceMod.dat",
+    'Bob': "keys/Bob/BobPrivExp.dat keys/Bob/BobPubExp.dat keys/Bob/BobMod.dat",
     }
 
 # delete tmp files
@@ -80,14 +128,14 @@ myTmpDir = "./tmp/"
 ## Try to remove tree; if failed show an error using try...except on screen
 try:
     shutil.rmtree(myTmpDir)
-except OSError, e:
+except OSError as e:
     print ("Error: %s - %s." % (e.filename,e.strerror))
 
 # make the tmp dir
 os.mkdir(myTmpDir)
 
 top = tkinter.Tk()
-top.title("Chatter")
+top.title("RSA encryption/decryption")
 
 messages_frame = tkinter.Frame(top)
 scrollbar = tkinter.Scrollbar(messages_frame)  # To navigate through past messages.
